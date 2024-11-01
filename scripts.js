@@ -1,4 +1,5 @@
 document.getElementById('certification-form').addEventListener('submit', async function(event) {
+    console.log("Form submitted!"); // Log when the form is submitted
     event.preventDefault();
     
     const name = document.getElementById('name').value;
@@ -6,10 +7,19 @@ document.getElementById('certification-form').addEventListener('submit', async f
 
     // Load the template
     const response = await fetch('template.docx');
-    const templateArrayBuffer = await response.arrayBuffer();
+    console.log("Template response:", response); // Log the fetch response
 
-    const Docxtemplater = require('docxtemplater');
+    // Check if the response is OK (status 200)
+    if (!response.ok) {
+        console.error("Error fetching template:", response.statusText);
+        return; // Exit if the template can't be fetched
+    }
+
+    const templateArrayBuffer = await response.arrayBuffer();
+    console.log("Template loaded successfully."); // Log when template is loaded
+
     const PizZip = require('pizzip');
+    const Docxtemplater = require('docxtemplater');
 
     const zip = new PizZip(templateArrayBuffer);
     const doc = new Docxtemplater(zip);
@@ -20,6 +30,7 @@ document.getElementById('certification-form').addEventListener('submit', async f
     try {
         // Render the document
         doc.render();
+        console.log("Document rendered successfully."); // Log successful rendering
         const buf = doc.getZip().generate({ type: 'blob' });
 
         // Create a download link
